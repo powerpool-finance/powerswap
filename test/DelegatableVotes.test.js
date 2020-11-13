@@ -1,4 +1,4 @@
-/* global after, afterEach, artifacts, before, beforeEach, contract, describe, it, web3 */
+const assert = require('chai').assert;
 const MockDelegatableVotes = artifacts.require('MockDelegatableVotes');
 
 describe('DelegatableVotes', () => {

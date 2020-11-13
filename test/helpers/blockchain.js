@@ -1,4 +1,3 @@
-/* global module, web3 */
 const getCounter = (n => () => n++)(1);
 
 module.exports = {

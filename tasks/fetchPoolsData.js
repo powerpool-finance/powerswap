@@ -1,4 +1,3 @@
-/* global usePlugin, task */
 usePlugin('@nomiclabs/buidler-truffle5');
 
 const fs = require('fs');

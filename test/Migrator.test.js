@@ -1,4 +1,5 @@
-const { expectRevert, time } = require('@openzeppelin/test-helpers');
+const { expectRevert } = require('@openzeppelin/test-helpers');
+const assert = require('chai').assert;
 const CvpToken = artifacts.require('MockCvp');
 const LPMining = artifacts.require('LPMining');
 const MockERC20 = artifacts.require('MockERC20');

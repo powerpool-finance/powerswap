@@ -1,4 +1,3 @@
-/* global artifacts, web3 */
 const LPMining = artifacts.require('LPMining');
 const MockCvp = artifacts.require('MockCvp');
 const Reservoir = artifacts.require('Reservoir');

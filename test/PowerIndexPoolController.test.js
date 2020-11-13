@@ -1,4 +1,5 @@
-const { expectRevert, time, ether, expectEvent } = require('@openzeppelin/test-helpers');
+const { expectRevert, ether, expectEvent } = require('@openzeppelin/test-helpers');
+const assert = require('chai').assert;
 const BFactory = artifacts.require('BFactory');
 const BActions = artifacts.require('BActions');
 const BPool = artifacts.require('BPool');
@@ -70,19 +71,14 @@ describe('PowerIndexPoolController', () => {
   let poolWrapper;
   let controller;
 
-  let minter, bob, carol, alice, feeManager, feeReceiver, communityWallet, newCommunityWallet;
+  let minter, alice, communityWallet;
   let amountToSwap, amountCommunitySwapFee, amountAfterCommunitySwapFee, expectedSwapOut;
 
   before(async function () {
     [
       minter,
-      bob,
-      carol,
       alice,
-      feeManager,
-      feeReceiver,
       communityWallet,
-      newCommunityWallet,
     ] = await web3.eth.getAccounts();
   });
 

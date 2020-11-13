@@ -1,4 +1,3 @@
-/* global artifacts, web3 */
 
 module.exports = function (deployer, network, accounts) {
   const isMainnet = network === 'mainnet';

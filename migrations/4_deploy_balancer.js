@@ -17,8 +17,8 @@ module.exports = function (deployer, network, accounts) {
       wethAddress = weth.address;
     }
 
-    const bFactory = await deployer.deploy(BFactory);
-    const bActions = await deployer.deploy(BActions);
-    const exchangeProxy = await deployer.deploy(ExchangeProxy, wethAddress);
+    await deployer.deploy(BFactory);
+    await deployer.deploy(BActions);
+    await deployer.deploy(ExchangeProxy, wethAddress);
   });
 };

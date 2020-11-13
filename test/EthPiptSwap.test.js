@@ -1,6 +1,7 @@
 const fs = require('fs');
 
-const { expectRevert, time, ether } = require('@openzeppelin/test-helpers');
+const { expectRevert, ether } = require('@openzeppelin/test-helpers');
+const assert = require('chai').assert;
 const BFactory = artifacts.require('BFactory');
 const BActions = artifacts.require('BActions');
 const BPool = artifacts.require('BPool');
@@ -42,9 +43,9 @@ describe('EthPiptSwap', () => {
 
   const gasPrice = 1000000000;
 
-  let minter, bob, carol, alice, feeManager, feeReceiver, permanentVotingPower;
+  let minter, bob, feeManager, feeReceiver, permanentVotingPower;
   before(async function () {
-    [minter, bob, carol, alice, feeManager, feeReceiver, permanentVotingPower] = await web3.eth.getAccounts();
+    [minter, bob, feeManager, feeReceiver, permanentVotingPower] = await web3.eth.getAccounts();
   });
 
   beforeEach(async () => {
@@ -79,7 +80,7 @@ describe('EthPiptSwap', () => {
         'MP',
         tokens.map(t => t.address),
         balances.map(b => ether(b.toString(10))),
-        tokens.map(t => ether(weightPart.toString(10))),
+        tokens.map(() => ether(weightPart.toString(10))),
         [swapFee, communitySwapFee, communityJoinFee, communityExitFee],
         permanentVotingPower,
         true,
@@ -144,7 +145,7 @@ describe('EthPiptSwap', () => {
         ethPiptSwap.setTokensSettings(
           tokens.map(t => t.address),
           pairs.map(p => p.address),
-          pairs.map(p => true),
+          pairs.map(() => true),
           { from: bob },
         ),
         'Ownable: caller is not the owner',
@@ -153,7 +154,7 @@ describe('EthPiptSwap', () => {
       await ethPiptSwap.setTokensSettings(
         tokens.map(t => t.address),
         pairs.map(p => p.address),
-        pairs.map(p => true),
+        pairs.map(() => true),
         { from: minter },
       );
 

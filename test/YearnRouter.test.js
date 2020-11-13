@@ -1,4 +1,5 @@
 const { time, ether: rEther } = require('@openzeppelin/test-helpers');
+const assert = require('chai').assert;
 const BFactory = artifacts.require('BFactory');
 const BPool = artifacts.require('BPool');
 const MockERC20 = artifacts.require('MockERC20');
@@ -24,18 +25,13 @@ function ether(value) {
 }
 
 describe('PowerIndexRouter Tests', () => {
-  let minter, bob, carol, alice, feeManager, feeReceiver, communityWallet, newCommunityWallet, yearnOwner;
+  let minter, bob, alice, yearnOwner;
 
   before(async function () {
     [
       minter,
       bob,
-      carol,
       alice,
-      feeManager,
-      feeReceiver,
-      communityWallet,
-      newCommunityWallet,
       yearnOwner,
     ] = await web3.eth.getAccounts();
   });

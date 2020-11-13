@@ -1,4 +1,3 @@
-/* global artifacts, web3 */
 const MockERC20 = artifacts.require('MockERC20');
 const BFactory = artifacts.require('BFactory');
 const BActions = artifacts.require('BActions');

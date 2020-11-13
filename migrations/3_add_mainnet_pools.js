@@ -1,4 +1,3 @@
-/* global artifacts, web3 */
 const getUserspace = require('./1_userspace');
 
 module.exports = function (deployer, network, accounts) {

@@ -1,6 +1,6 @@
-/* global after, afterEach, artifacts, before, beforeEach, contract, describe, it, web3 */
 const { expectRevert, time } = require('@openzeppelin/test-helpers');
 const { createSnapshot, revertToSnapshot } = require('./helpers/blockchain');
+const assert = require('chai').assert;
 const CvpToken = artifacts.require('MockCvp');
 const LPMining = artifacts.require('LPMining');
 const VestedLPMining = artifacts.require('VestedLPMining');
@@ -13,11 +13,6 @@ MockERC20.numberFormat = 'String';
 const { web3 } = Reservoir;
 const { toBN } = web3.utils;
 
-function subBN(bn1, bn2) {
-  return toBN(bn1.toString(10))
-    .sub(toBN(bn2.toString(10)))
-    .toString(10);
-}
 function addBN(bn1, bn2) {
   return toBN(bn1.toString(10))
     .add(toBN(bn2.toString(10)))
@@ -26,11 +21,6 @@ function addBN(bn1, bn2) {
 function mulBN(bn1, bn2) {
   return toBN(bn1.toString(10))
     .mul(toBN(bn2.toString(10)))
-    .toString(10);
-}
-function divBN(bn1, bn2) {
-  return toBN(bn1.toString(10))
-    .div(toBN(bn2.toString(10)))
     .toString(10);
 }
 

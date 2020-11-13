@@ -1,10 +1,10 @@
 const { expectRevert, time, ether: ozEther } = require('@openzeppelin/test-helpers');
+const assert = require('chai').assert;
 
 const PowerIndexPoolFactory = artifacts.require('PowerIndexPoolFactory');
 const PowerIndexPoolActions = artifacts.require('PowerIndexPoolActions');
 const PowerIndexPool = artifacts.require('PowerIndexPool');
 const MockERC20 = artifacts.require('MockERC20');
-const MockVoting = artifacts.require('MockVoting');
 const MockCvp = artifacts.require('MockCvp');
 const WETH = artifacts.require('MockWETH');
 const ExchangeProxy = artifacts.require('ExchangeProxy');
@@ -83,9 +83,9 @@ describe('PowerIndexPool', () => {
   let pool;
   let fromWeights;
 
-  let controller, bob, carol, alice, feeManager, feeReceiver, communityWallet;
+  let controller, alice, communityWallet;
   before(async function () {
-    [controller, bob, carol, alice, feeManager, feeReceiver, communityWallet] = await web3.eth.getAccounts();
+    [controller, alice, communityWallet] = await web3.eth.getAccounts();
   });
 
   beforeEach(async () => {
@@ -195,7 +195,6 @@ describe('PowerIndexPool', () => {
         mulScalarBN(ratio, await pool.getBalance(this.token2.address)),
         ether('1.001'),
       );
-      const poolOutAmountFee = mulScalarBN(poolOutAmount, communityJoinFee);
 
       await this.token1.transfer(alice, token1InAmount);
       await this.token1.approve(pool.address, token1InAmount, { from: alice });
@@ -290,7 +289,7 @@ describe('PowerIndexPool', () => {
   });
 
   describe('setDynamicWeight', async () => {
-    it(`setDynamicWeight should revert for incorrect values`, async () => {
+    it('setDynamicWeight should revert for incorrect values', async () => {
       await expectRevert(
         pool.setDynamicWeight(tokens[0], ether('40'), '1', '2', { from: controller }),
         'CANT_SET_PAST_TIMESTAMP',
@@ -392,7 +391,7 @@ describe('PowerIndexPool', () => {
   });
 
   describe('test swap after time spent', async () => {
-    let amountToSwap, amountCommunitySwapFee, amountAfterCommunitySwapFee, expectedSwapOut;
+    let amountToSwap, amountCommunitySwapFee;
 
     beforeEach(async () => {
       amountToSwap = ether('1').toString(10);
@@ -403,7 +402,6 @@ describe('PowerIndexPool', () => {
       await this.token2.approve(this.bActions.address, mulScalarBN(amountToSwap, ether('2')), { from: alice });
 
       amountCommunitySwapFee = mulScalarBN(amountToSwap, communitySwapFee);
-      amountAfterCommunitySwapFee = subBN(amountToSwap, amountCommunitySwapFee);
     });
 
     for (let sec = 10; sec < 13000; sec += 1000) {
@@ -443,7 +441,6 @@ describe('PowerIndexPool', () => {
     let amountToSwap,
       amountCommunitySwapFee,
       amountAfterCommunitySwapFee,
-      expectedSwapOut,
       token1BalanceNeedInWithFee,
       token2BalanceNeedInWithFee;
     beforeEach(async () => {
@@ -472,9 +469,7 @@ describe('PowerIndexPool', () => {
       await this.token1.approve(this.bActions.address, amountToSwap, { from: alice });
       await this.token2.approve(this.bActions.address, mulScalarBN(amountToSwap, ether('2')), { from: alice });
 
-      expectedSwapOut = await this.calcOutGivenIn(tokens[0], tokens[1], amountAfterCommunitySwapFee);
       [token1BalanceNeedInWithFee, token2BalanceNeedInWithFee] = await needTokensBalanceIn(pool, tokens);
-      token2BalanceNeedInWithFee = token2BalanceNeedInWithFee.replace('-', '');
     });
 
     it('balances ratio should be restored by joinswapExternAmountIn and exitswapExternAmountOut', async () => {
@@ -583,7 +578,6 @@ describe('PowerIndexPool', () => {
       await time.increase(11000);
 
       const token1BalanceNeedInWithFee = ether('188000');
-      const token2BalanceNeedInWithFee = ether('6170');
 
       await this.joinPool([this.token1, this.token2], token1BalanceNeedInWithFee);
 
@@ -858,7 +852,7 @@ describe('PowerIndexPool', () => {
   async function needTokensBalanceIn(pool, tokens) {
     let totalFromWeights = '0';
     let totalTargetWeights = '0';
-    await pIteration.forEachSeries(tokens, async (t, index) => {
+    await pIteration.forEachSeries(tokens, async (t) => {
       const dw = await pool.getDynamicWeightSettings(t);
       totalFromWeights = addBN(totalFromWeights, dw.fromDenorm);
       totalTargetWeights = addBN(totalTargetWeights, dw.targetDenorm);

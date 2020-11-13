@@ -1,4 +1,5 @@
-const { expectRevert, time, ether } = require('@openzeppelin/test-helpers');
+const { expectRevert, ether } = require('@openzeppelin/test-helpers');
+const assert = require('chai').assert;
 const BFactory = artifacts.require('BFactory');
 const BActions = artifacts.require('BActions');
 const BPool = artifacts.require('BPool');
@@ -63,9 +64,9 @@ describe('Balancer', () => {
   let pool;
   let permanentVotingPower;
 
-  let minter, bob, carol, alice, feeManager, feeReceiver, newCommunityWallet;
+  let minter, alice, feeManager, feeReceiver, newCommunityWallet;
   before(async function () {
-    [minter, bob, carol, alice, feeManager, feeReceiver, newCommunityWallet] = await web3.eth.getAccounts();
+    [minter, alice, feeManager, feeReceiver, newCommunityWallet] = await web3.eth.getAccounts();
   });
 
   beforeEach(async () => {

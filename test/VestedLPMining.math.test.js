@@ -1,6 +1,6 @@
-/* global after, afterEach, artifacts, assert, before, beforeEach, context, contract, describe, it, web3 */
 const { time } = require('@openzeppelin/test-helpers');
 const { createSnapshot, revertToSnapshot } = require('./helpers/blockchain');
+const assert = require('chai').assert;
 const MockVestedLPMiningMath = artifacts.require('MockVestedLPMiningMath');
 
 const { toBN } = web3.utils;
