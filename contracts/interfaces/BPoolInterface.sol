@@ -2,17 +2,10 @@
 
 pragma solidity 0.6.12;
 
-interface BPoolInterface {
-  function approve(address spender, uint256 amount) external returns (bool);
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./BMathInterface.sol";
 
-  function transfer(address recipient, uint256 amount) external returns (bool);
-
-  function transferFrom(
-    address spender,
-    address recipient,
-    uint256 amount
-  ) external returns (bool);
-
+interface BPoolInterface is IERC20, BMathInterface {
   function joinPool(uint256 poolAmountOut, uint256[] calldata maxAmountsIn) external;
 
   function exitPool(uint256 poolAmountIn, uint256[] calldata minAmountsOut) external;
@@ -57,24 +50,11 @@ interface BPoolInterface {
     uint256
   ) external returns (uint256);
 
-  function calcInGivenOut(
-    uint256,
-    uint256,
-    uint256,
-    uint256,
-    uint256,
-    uint256
-  ) external pure returns (uint256);
-
   function getDenormalizedWeight(address) external view returns (uint256);
 
   function getBalance(address) external view returns (uint256);
 
   function getSwapFee() external view returns (uint256);
-
-  function totalSupply() external view returns (uint256);
-
-  function balanceOf(address) external view returns (uint256);
 
   function getTotalDenormalizedWeight() external view returns (uint256);
 
@@ -138,5 +118,5 @@ interface BPoolInterface {
     uint256 value
   ) external;
 
-  function MIN_WEIGHT() external view returns (uint256);
+  function getMinWeight() external view returns (uint256);
 }
