@@ -14,6 +14,7 @@ require('./tasks/deployMainnetYeti');
 require('./tasks/deployYearnRouter');
 require('./tasks/deployAaveRouter');
 require('./tasks/testVestedLpMiningProxy');
+require('./tasks/testVestedLpMiningCalc');
 
 const fs = require('fs');
 const homeDir = require('os').homedir();

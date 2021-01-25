@@ -79,4 +79,21 @@ contract MockVestedLPMining is VestedLPMining {
   function setPoolBoostLastUpdateBlock(uint256 pid, uint32 lastUpdateBlock) external {
     poolBoostByLp[pid].lastUpdateBlock = lastUpdateBlock;
   }
+
+  function __computeReward(
+    uint256 _lastUpdateBlock,
+    uint256 _accumulated,
+    IERC20 _token,
+    uint256 _cvpPoolRate
+  )
+    public
+    view
+    returns (
+      uint256 poolCvpReward,
+      uint256 newAccumulated,
+      uint32 newLastUpdateBlock
+    )
+  {
+    return _computeReward(_lastUpdateBlock, _accumulated, _token, _cvpPoolRate);
+  }
 }
