@@ -15,6 +15,7 @@ require('./tasks/deployYearnRouter');
 require('./tasks/deployAaveRouter');
 require('./tasks/deployProxyFactory');
 require('./tasks/deployMainnetAssy');
+require('./tasks/deployTestnetPool');
 require('./tasks/testVestedLpMiningProxy');
 
 const fs = require('fs');
