@@ -1,31 +1,38 @@
 require('@nomiclabs/hardhat-truffle5');
 
-task('deploy-mainnet-weights-strategy', 'Deploy Mainnet Weights Strategy').setAction(async (__, {ethers, network}) => {
+const configByTokenAddress = require('./config/ylaPool');
+// const configByTokenAddress = require('./tasks/config/ylaPool');
+
+task('deploy-mainnet-weights-strategy', 'Deploy Mainnet Instant Rebind Strategy').setAction(async (__, {ethers, network}) => {
   const {impersonateAccount, gwei, fromEther, ethUsed, deployProxied} = require('../test/helpers');
   const PowerIndexPoolController = artifacts.require('PowerIndexPoolController');
   const PowerIndexPool = artifacts.require('PowerIndexPool');
-  const MCapWeightStrategy = artifacts.require('MCapWeightStrategy');
+  const InstantRebindStrategy = artifacts.require('InstantRebindStrategy');
   const PowerPoke = await artifacts.require('PowerPoke');
-
   const { web3 } = PowerIndexPoolController;
+  console.log('Provider updated');
+
   const { toWei } = web3.utils;
 
   const [deployer] = await web3.eth.getAccounts();
   console.log('deployer', deployer);
   // const sendOptions = { from: deployer };
 
-  const weightsChangeDuration = 24 * 60 * 60;
   const zeroAddress = '0x0000000000000000000000000000000000000000';
   const admin = '0xb258302c3f209491d604165549079680708581cc';
   const proxyAdminAddr = '0x7696f9208f9e195ba31e6f4B2D07B6462C8C42bb';
-  const oracleAddress = '0x50f8D7f4db16AA926497993F020364f739EDb988';
-  const poolAddress = '0xfa2562da1bba7b954f26c74725df51fb62646313';
+  const poolAddress = '0x9ba60ba98413a60db4c651d4afe5c937bbd8044b';
   const powerPokeAddress = '0x04D7aA22ef7181eE3142F5063e026Af1BbBE5B96';
+  const usdcAddress = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+  const curePoolRegistryAddress = '0x7D86446dDb609eD0F5f8684AcF30380a356b2B4c';
 
   const weightStrategy =  await deployProxied(
-    MCapWeightStrategy,
-    [],
-    [oracleAddress, powerPokeAddress, weightsChangeDuration],
+    InstantRebindStrategy,
+    [usdcAddress],
+    [powerPokeAddress, curePoolRegistryAddress, {
+      minUSDCRemainder: '20',
+      useVirtualPriceEstimation: false
+    }],
     {
       proxyAdmin: proxyAdminAddr,
       // proxyAdminOwner: admin,
@@ -39,13 +46,15 @@ task('deploy-mainnet-weights-strategy', 'Deploy Mainnet Weights Strategy').setAc
   console.log('controller.address', controller.address);
   await weightStrategy.addPool(poolAddress, controller.address, zeroAddress);
 
-  const excludeBalances = [
-    {token: '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9', excludeTokenBalances: ['0x25F2226B597E8F9514B3F68F00f494cF4f286491', '0x317625234562B1526Ea2FaC4030Ea499C5291de4']}, // AAVE
-    {token: '0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e', excludeTokenBalances: ['0xFEB4acf3df3cDEA7399794D0869ef76A6EfAff52']}, // YFI
-    {token: '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f', excludeTokenBalances: ['0x971e78e0c92392a4e39099835cf7e6ab535b2227', '0xda4ef8520b1a57d7d63f1e249606d1a459698876']}, // SNX
-  ];
-
-  await weightStrategy.setExcludeTokenBalancesList(excludeBalances);
+  for (let vaultAddress of Object.keys(configByTokenAddress)) {
+    const cfg = configByTokenAddress[vaultAddress];
+    await weightStrategy.setVaultConfig(
+      vaultAddress,
+      cfg.depositor,
+      cfg.amountsLength,
+      cfg.usdcIndex,
+    );
+  }
 
   await weightStrategy.transferOwnership(admin);
 
@@ -61,6 +70,7 @@ task('deploy-mainnet-weights-strategy', 'Deploy Mainnet Weights Strategy').setAc
   const PER_GAS = '10000';
   const MIN_SLASHING_DEPOSIT = ether(40);
 
+  console.log('>>> Fork logic');
   await impersonateAccount(ethers, admin);
 
   const pool = await PowerIndexPool.at(poolAddress);
@@ -83,7 +93,9 @@ task('deploy-mainnet-weights-strategy', 'Deploy Mainnet Weights Strategy').setAc
     { PowerPokeRewardOpts: {to: 'address', compensateInETH: 'bool'} },
     {to: testWallet.address, compensateInETH: true},
   );
-  const res = await weightStrategy.pokeFromReporter('1', [poolAddress], powerPokeOpts, {from: pokerReporter});
+  console.log('>>> Before poke');
+  const res = await weightStrategy.pokeFromReporter('1', powerPokeOpts, {from: pokerReporter});
+  console.log('>>> After poke');
 
   console.log('powerPoke rewards', fromEther(await powerPoke.rewards('1')));
   console.log('ETH used', await ethUsed(web3, res.receipt));

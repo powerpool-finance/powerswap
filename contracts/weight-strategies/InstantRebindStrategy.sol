@@ -93,12 +93,10 @@ contract InstantRebindStrategy is PoolManagement, WeightValueAbstract {
   function initialize(
     address _powerPoke,
     address _curvePoolRegistry,
-    address _oracle,
     StrategyConstraints memory _constraints
   ) external initializer {
     __Ownable_init();
     powerPoke = IPowerPoke(_powerPoke);
-    oracle = IPowerOracle(_oracle);
     curvePoolRegistry = ICurvePoolRegistry(_curvePoolRegistry);
     constraints = _constraints;
     totalWeight = 25 * BONE;
